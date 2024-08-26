@@ -1,0 +1,38 @@
+global:
+  scrape_interval: 15s  # Set the global scrape interval (default is 1 minute)
+
+scrape_configs:
+  # Scrape Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Scrape Node Exporter running on a Linux server
+  - job_name: 'linux_server'
+    static_configs:
+      - targets: ['192.168.1.10:9100']
+
+  # Scrape SNMP data from your router
+  - job_name: 'router'
+    static_configs:
+      - targets: ['192.168.1.1:9116']
+    metrics_path: /snmp
+    params:
+      module: [default]  # Use the default SNMP module configuration
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - target_label: instance
+        replacement: ''
+      - target_label: __address__
+        replacement: 'snmp_exporter:9116'  # Replace with the address of your SNMP exporter
+
+  # Additional jobs for other devices
+  - job_name: 'nas'
+    static_configs:
+      - targets: ['192.168.1.20:9100']
+
+  - job_name: 'windows_server'
+    static_configs:
+      - targets: ['192.168.1.30:9182']
+
